@@ -1,0 +1,7 @@
+@model List<Payment>
+@{ ViewData["Title"] = "Earnings"; }
+<h3>Earnings</h3>
+<div class="card p-3 mb-3"><div class="stat">@Ui.Money(Model.Sum(p => p.Amount))</div>Total earnings</div>
+<div class="card p-3"><table class="table mb-0"><thead><tr><th>Property</th><th>Guest</th><th>Date</th><th class="text-end">Amount</th></tr></thead><tbody>
+@foreach (var p in Model) { <tr><td>@p.Booking.Property.Title</td><td>@p.Booking.Guest.FullName</td><td>@p.CreatedAt.ToString("yyyy-MM-dd")</td><td class="text-end">@Ui.Money(p.Amount)</td></tr> }
+</tbody></table></div>

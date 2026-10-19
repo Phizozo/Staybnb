@@ -1,0 +1,10 @@
+@model List<WishlistItem>
+@{ ViewData["Title"] = "Wishlist"; }
+<h3>Wishlist</h3>
+@if (!Model.Any()) { <p class="text-muted">Nothing saved yet.</p> }
+<div class="row g-4">
+    @foreach (var w in Model)
+    {
+        <div class="col-6 col-md-4 col-xl-3"><partial name="_PropertyCard" model="w.Property" view-data='new ViewDataDictionary(ViewData) { { "Wished", true } }' /></div>
+    }
+</div>

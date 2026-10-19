@@ -1,0 +1,11 @@
+@model CheckInProcessVM
+@{ ViewData["Title"] = "Check-in process"; }
+<div class="container" style="max-width:700px"><h3>Check-in process</h3><p class="text-muted">@Model.PropertyTitle - define the rules and documents guests must provide.</p>
+<div class="card p-4"><form asp-action="CheckInProcess" method="post">
+    <div asp-validation-summary="All" class="text-danger"></div>
+    <input type="hidden" asp-for="PropertyId" />
+    <div class="mb-3"><label asp-for="Title" class="form-label"></label><input asp-for="Title" class="form-control" /></div>
+    <div class="mb-3"><label asp-for="Rules" class="form-label"></label><textarea asp-for="Rules" rows="5" class="form-control"></textarea></div>
+    <div class="mb-3"><label asp-for="Documents" class="form-label"></label><textarea asp-for="Documents" rows="3" class="form-control"></textarea></div>
+    <button class="btn btn-brand">Save</button> <a class="btn btn-light" asp-action="Properties">Cancel</a>
+</form></div></div>

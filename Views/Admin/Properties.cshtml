@@ -1,0 +1,6 @@
+@model List<HostProperty>
+@{ ViewData["Title"] = "Properties"; }
+<h3>All Properties</h3>
+<div class="card p-3"><table class="table align-middle mb-0"><thead><tr><th></th><th>Title</th><th>Host</th><th>City</th><th>Price</th><th>Status</th></tr></thead><tbody>
+@foreach (var p in Model) { <tr><td>@if (p.Images.Any()) { <img src="@p.Images.First().ImageUrl" style="width:64px;height:48px;object-fit:cover;border-radius:6px" /> }</td><td><a asp-controller="Properties" asp-action="Details" asp-route-id="@p.Id">@p.Title</a></td><td>@p.Host.FullName</td><td>@p.City</td><td>@Ui.Money(p.PricePerNight)</td><td><span class="badge @Ui.Badge(p.IsActive ? "Active" : "Inactive")">@(p.IsActive ? "Active" : "Inactive")</span></td></tr> }
+</tbody></table></div>

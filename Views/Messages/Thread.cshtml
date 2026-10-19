@@ -1,0 +1,15 @@
+@model ThreadVM
+@{ ViewData["Title"] = "Conversation"; var me = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier).Value; }
+<div style="max-width:700px">
+    <a asp-action="Index">← Inbox</a>
+    <h4 class="mt-2">@Model.Partner.FullName</h4>
+    <div class="card p-3 mb-3" style="max-height:60vh;overflow:auto">
+        @if (!Model.Messages.Any()) { <p class="text-muted mb-0">Say hello!</p> }
+        @foreach (var m in Model.Messages)
+        {
+            var mine = m.SenderId == me;
+            <div class="d-flex @(mine ? "justify-content-end" : "") mb-2"><div class="p-2 rounded-3 @(mine ? "bg-danger text-white" : "bg-light")" style="max-width:75%"><div style="white-space:pre-line">@m.Content</div><div class="small @(mine ? "text-white-50" : "text-muted")">@m.Timestamp.ToString("yyyy-MM-dd HH:mm")</div></div></div>
+        }
+    </div>
+    <form asp-action="Send" method="post" class="d-flex gap-2"><input type="hidden" name="receiverId" value="@Model.Partner.Id" /><textarea name="content" class="form-control" rows="2" required placeholder="Write a reply..."></textarea><button class="btn btn-brand">Send</button></form>
+</div>

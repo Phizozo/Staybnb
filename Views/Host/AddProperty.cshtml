@@ -1,0 +1,4 @@
+@model PropertyFormVM
+@{ ViewData["Title"] = "Add property"; ViewData["C"] = "Host"; ViewData["A"] = "AddProperty"; ViewData["Button"] = "Submit for approval"; ViewData["ImagesRequired"] = true; }
+<div class="container" style="max-width:850px"><h3>Add a new property</h3><p class="text-muted">New listings are reviewed by an admin before going live.</p>
+<div class="card p-4"><partial name="_PropertyForm" model="Model" view-data="ViewData" /></div></div>

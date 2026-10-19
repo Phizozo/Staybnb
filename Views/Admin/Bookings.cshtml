@@ -1,0 +1,6 @@
+@model List<Booking>
+@{ ViewData["Title"] = "Bookings"; }
+<h3>All Bookings</h3>
+<div class="card p-3"><table class="table mb-0"><thead><tr><th>#</th><th>Guest</th><th>Property</th><th>Dates</th><th>Total</th><th>Status</th><th>Payment</th></tr></thead><tbody>
+@foreach (var b in Model) { <tr><td>@b.Id</td><td>@b.Guest.FullName</td><td>@b.Property.Title</td><td>@b.CheckInDate.ToString("yyyy-MM-dd") → @b.CheckOutDate.ToString("yyyy-MM-dd")</td><td>@Ui.Money(b.TotalPrice)</td><td><span class="badge @Ui.Badge(b.Status)">@b.Status</span></td><td><span class="badge @Ui.Badge(b.Payment?.Status)">@b.Payment?.Status</span></td></tr> }
+</tbody></table></div>

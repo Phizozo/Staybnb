@@ -1,0 +1,13 @@
+@model List<HostApplication>
+@{ ViewData["Title"] = "Host application status"; }
+<h3>Host Application Status</h3>
+@if (!Model.Any()) { <p class="text-muted">You haven't applied yet. <a asp-action="Apply">Become a Host</a></p> }
+@foreach (var a in Model)
+{
+    <div class="card p-3 mb-3 d-flex flex-row gap-3 align-items-center">
+        @if (a.Property.Images.Any()) { <img src="@a.Property.Images.First().ImageUrl" style="width:120px;height:90px;object-fit:cover;border-radius:10px" /> }
+        <div class="flex-grow-1"><strong>@a.Property.Title</strong><div class="text-muted small">@a.Property.City · applied @a.AppliedAt.ToString("yyyy-MM-dd")</div>
+            @if (!string.IsNullOrEmpty(a.AdminNote)) { <div class="small">Admin note: @a.AdminNote</div> }</div>
+        <span class="badge @Ui.Badge(a.Status)">@a.Status</span>
+    </div>
+}

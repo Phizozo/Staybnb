@@ -1,0 +1,19 @@
+@model GuestCheckIn
+@{ ViewData["Title"] = "Verify check-in"; }
+<div class="container" style="max-width:800px">
+    <a asp-action="CheckIns">← Back</a>
+    <h3 class="mt-2">@Model.Booking.Guest.FullName - @Model.Booking.Property.Title</h3>
+    <p>Stay: @Model.Booking.CheckInDate.ToString("yyyy-MM-dd") to @Model.Booking.CheckOutDate.ToString("yyyy-MM-dd") · Check-in: <span class="badge @Ui.Badge(Model.Status)">@Model.Status</span> · Booking: <span class="badge @Ui.Badge(Model.Booking.Status)">@Model.Booking.Status</span></p>
+    @foreach (var d in Model.Documents)
+    {
+        <div class="card p-3 mb-2 d-flex flex-row justify-content-between align-items-center">
+            <div><strong>@d.DocumentType</strong><div><a target="_blank" asp-controller="Documents" asp-action="Download" asp-route-id="@d.Id">@d.OriginalName</a></div></div>
+            <div class="d-flex gap-2 align-items-center"><span class="badge @Ui.Badge(d.Status)">@d.Status</span>
+                @if (Model.Status == CheckInStatus.Submitted)
+                {
+                    <form asp-action="DocumentAction" method="post"><input type="hidden" name="id" value="@d.Id" /><button name="act" value="verify" class="btn btn-sm btn-success">Verify</button> <button name="act" value="reject" class="btn btn-sm btn-danger">Reject</button></form>
+                }</div>
+        </div>
+    }
+    @if (!Model.Documents.Any()) { <p class="text-muted">No documents uploaded.</p> }
+</div>

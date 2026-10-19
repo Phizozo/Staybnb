@@ -1,0 +1,24 @@
+@model List<HostProperty>
+@{ ViewData["Title"] = "My Properties"; var apps = ViewBag.Applications as List<HostApplication>; }
+<div class="d-flex justify-content-between mb-3"><h3>My Properties</h3><a class="btn btn-brand" asp-action="AddProperty">+ Add New Property</a></div>
+@foreach (var p in Model)
+{
+    <div class="card p-3 mb-3"><div class="d-flex gap-3 align-items-center">
+        @if (p.Images.Any()) { <img src="@p.Images.First().ImageUrl" style="width:180px;height:120px;object-fit:cover;border-radius:10px" /> }
+        <div class="flex-grow-1"><strong>@p.Title</strong><div class="text-muted small">@p.City · @p.MaxGuests guests · @p.Bedrooms bedrooms · @p.Bathrooms bathrooms</div>
+            <div class="small">@p.Bookings.Count booking(s) · @(p.Reviews.Any() ? p.Reviews.Count + " review(s)" : "No reviews")</div></div>
+        <div class="text-end"><div class="fw-bold">@Ui.Money(p.PricePerNight)<small class="text-muted"> /night</small></div><span class="badge @Ui.Badge(p.IsActive ? "Active" : "Inactive")">@(p.IsActive ? "Active" : "Inactive")</span></div>
+    </div>
+    <div class="d-flex gap-2 justify-content-end mt-2">
+        <a class="btn btn-sm btn-light" asp-controller="Properties" asp-action="Details" asp-route-id="@p.Id">View Details</a>
+        <a class="btn btn-sm btn-light" asp-action="EditProperty" asp-route-id="@p.Id">Edit</a>
+        <a class="btn btn-sm btn-light" asp-action="CheckInProcess" asp-route-propertyId="@p.Id">Check-in process</a>
+        <form asp-action="Toggle" asp-route-id="@p.Id" method="post"><button class="btn btn-sm @(p.IsActive ? "btn-danger" : "btn-success")">@(p.IsActive ? "Deactivate" : "Activate")</button></form>
+    </div></div>
+}
+@if (!Model.Any()) { <p class="text-muted">No approved properties yet.</p> }
+@if (apps != null && apps.Any())
+{
+    <h5 class="mt-4">Applications</h5>
+    @foreach (var a in apps) { <div class="card p-3 mb-2 d-flex flex-row justify-content-between"><span>@a.Property.Title (@a.Property.City)</span><span><span class="badge @Ui.Badge(a.Status)">@a.Status</span> <span class="small text-muted">@a.AdminNote</span></span></div> }
+}

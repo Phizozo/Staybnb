@@ -1,0 +1,36 @@
+@model PropertyFormVM
+@{
+    var amenities = ViewBag.Amenities as List<Amenity> ?? new List<Amenity>();
+    var imagesRequired = ViewData["ImagesRequired"] as bool? ?? true;
+}
+<form asp-controller="@((string)ViewData["C"])" asp-action="@((string)ViewData["A"])" method="post" enctype="multipart/form-data" class="row g-3">
+    <div asp-validation-summary="All" class="text-danger col-12"></div>
+    <input type="hidden" asp-for="Id" />
+    <div class="col-md-8"><label asp-for="Title" class="form-label"></label><input asp-for="Title" class="form-control" /><span asp-validation-for="Title" class="text-danger"></span></div>
+    <div class="col-md-4"><label asp-for="PropertyType" class="form-label"></label>
+        <select asp-for="PropertyType" class="form-select" asp-items="@(PropertyTypes.All.Select(t => new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem(t, t)))"></select></div>
+    <div class="col-12"><label asp-for="Description" class="form-label"></label><textarea asp-for="Description" rows="4" class="form-control"></textarea><span asp-validation-for="Description" class="text-danger"></span></div>
+    <div class="col-md-8"><label asp-for="Address" class="form-label"></label><input asp-for="Address" class="form-control" /></div>
+    <div class="col-md-4"><label asp-for="City" class="form-label"></label><input asp-for="City" class="form-control" /></div>
+    <div class="col-md-3"><label asp-for="PricePerNight" class="form-label"></label><input asp-for="PricePerNight" type="number" step="0.01" min="1" class="form-control" /></div>
+    <div class="col-md-3"><label asp-for="CleaningFee" class="form-label"></label><input asp-for="CleaningFee" type="number" step="0.01" min="0" class="form-control" /></div>
+    <div class="col-md-3"><label asp-for="MaxGuests" class="form-label"></label><input asp-for="MaxGuests" type="number" min="1" class="form-control" /></div>
+    <div class="col-md-3"><label asp-for="Bedrooms" class="form-label"></label><input asp-for="Bedrooms" type="number" min="0" class="form-control" /></div>
+    <div class="col-md-3"><label asp-for="Beds" class="form-label"></label><input asp-for="Beds" type="number" min="1" class="form-control" /></div>
+    <div class="col-md-3"><label asp-for="Bathrooms" class="form-label"></label><input asp-for="Bathrooms" type="number" min="1" class="form-control" /></div>
+    <div class="col-12">
+        <label class="form-label">Amenities</label>
+        <div class="d-flex flex-wrap gap-3">
+            @foreach (var a in amenities)
+            {
+                <div class="form-check"><input class="form-check-input" type="checkbox" name="AmenityIds" value="@a.Id" id="am@(a.Id)" @(Model.AmenityIds.Contains(a.Id) ? "checked" : "") /><label class="form-check-label" for="am@(a.Id)"><i class="bi @a.IconClass"></i> @a.Name</label></div>
+            }
+        </div>
+    </div>
+    <div class="col-12">
+        <label class="form-label">Property images @(imagesRequired ? "(at least one required)" : "(optional - added to existing)")</label>
+        <input type="file" name="Images" multiple accept="image/*" class="form-control" @(imagesRequired ? "required" : "") />
+        <span asp-validation-for="Images" class="text-danger"></span>
+    </div>
+    <div class="col-12"><button class="btn btn-brand px-4">@ViewData["Button"]</button></div>
+</form>
