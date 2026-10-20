@@ -8,9 +8,6 @@
 </tbody></table></div>
 <div class="d-flex gap-2 mt-3 align-items-center">
     @if (page > 1) { <a class="btn btn-sm btn-light" asp-action="ActivityLogs" asp-route-type="@type" asp-route-page="@(page - 1)">← Prev</a> }
-    @model IEnumarable<ActivityLog>
-    @{
-        ViewData["Title"] = "Activity  Logs";
-    }
+ 
     @if (page < pages) { <a class="btn btn-sm btn-light" asp-action="ActivityLogs" asp-route-type="@type" asp-route-page="@(page + 1)">Next →</a> }
 </div>
