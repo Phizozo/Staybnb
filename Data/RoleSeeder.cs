@@ -4,6 +4,9 @@ using Staybnb.Models;
 
 namespace Staybnb.Data;
 
+// Ensures SuperAdmin, Host, Guest roles exist and default SuperAdmin user
+//Logic: Check RoleExists -> Create role -> Assign Guest as default new user role
+
 public static class RoleSeeder
 {
     public static async Task SeedAsync(IServiceProvider sp)
