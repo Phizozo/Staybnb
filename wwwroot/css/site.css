@@ -1,0 +1,22 @@
+:root { --brand:#ff385c; }
+body { background:#f7f7f7; font-family:"Segoe UI",system-ui,sans-serif; }
+.brand { color:var(--brand); font-weight:700; text-decoration:none; font-size:1.35rem; }
+.btn-brand { background:var(--brand); color:#fff; border:0; } .btn-brand:hover { background:#e0314f; color:#fff; }
+.btn-outline-brand { border:1px solid var(--brand); color:var(--brand); } .btn-outline-brand:hover { background:var(--brand); color:#fff; }
+.text-brand { color:var(--brand)!important; }
+.topbar { background:#fff; border-bottom:1px solid #e5e5e5; position:sticky; top:0; z-index:100; }
+.sidebar { width:230px; min-height:calc(100vh - 57px); background:#fff; border-right:1px solid #e5e5e5; flex-shrink:0; }
+.sidebar a { display:block; padding:.6rem 1rem; color:#444; text-decoration:none; border-radius:.5rem; margin:.15rem .5rem; }
+.sidebar a:hover, .sidebar a.active { background:#ffe9ed; color:var(--brand); }
+.prop-card img { width:100%; aspect-ratio:4/3; object-fit:cover; border-radius:1rem; }
+.prop-card { position:relative; text-decoration:none; color:inherit; }
+.heart { position:absolute; top:10px; right:12px; z-index:3; }
+.heart button { background:rgba(255,255,255,.85); border:0; border-radius:50%; width:34px; height:34px; }
+.stat-card { background:#fff; border:1px solid #eee; border-radius:1rem; padding:1.2rem; }
+.stat-card .num { font-size:1.8rem; font-weight:700; }
+.gallery img { width:100%; height:100%; object-fit:cover; }
+.card { border-radius:1rem; border:1px solid #eee; }
+.msg-me { background:var(--brand); color:#fff; border-radius:1rem 1rem 0 1rem; }
+.msg-them { background:#fff; border:1px solid #eee; border-radius:1rem 1rem 1rem 0; }
+.step { display:inline-flex; width:32px; height:32px; border-radius:50%; background:#ddd; align-items:center; justify-content:center; font-weight:700; }
+.step.done { background:#198754; color:#fff; } .step.now { background:var(--brand); color:#fff; }

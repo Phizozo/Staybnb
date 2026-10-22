@@ -1,0 +1,5 @@
+@model List<Review>
+@{ ViewData["Title"] = "Reviews"; }
+<h3>Reviews</h3>
+@if (!Model.Any()) { <p class="text-muted">No reviews yet.</p> }
+@foreach (var r in Model) { <div class="card p-3 mb-2"><strong>@r.Property.Title</strong><div><span class="text-warning">@(new string('★', r.Rating))</span> by @r.Reviewer.FullName · @r.CreatedAt.ToString("yyyy-MM-dd")</div><div>@r.Comment</div></div> }

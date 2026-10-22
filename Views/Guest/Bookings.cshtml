@@ -1,0 +1,32 @@
+@model List<Booking>
+@{ ViewData["Title"] = "My bookings"; }
+<h3>My Bookings</h3>
+@if (!Model.Any()) { <p class="text-muted">No bookings yet. <a asp-controller="Properties" asp-action="Index">Explore stays</a></p> }
+@foreach (var b in Model)
+{
+    <div class="card p-3 mb-3">
+        <div class="d-flex gap-3">
+            @if (b.Property.Images.Any()) { <img src="@b.Property.Images.First().ImageUrl" style="width:140px;height:100px;object-fit:cover;border-radius:10px" /> }
+            <div class="flex-grow-1">
+                <a asp-controller="Properties" asp-action="Details" asp-route-id="@b.PropertyId"><strong>@b.Property.Title</strong></a>
+                <div class="text-muted small">@b.CheckInDate.ToString("yyyy-MM-dd") to @b.CheckOutDate.ToString("yyyy-MM-dd") · @b.Nights night(s) · @b.NumberOfGuests guest(s)</div>
+                <div class="small">Cleaning @Ui.Money(b.CleaningFee) · Service @Ui.Money(b.ServiceFee)</div>
+                <div><strong>Total @Ui.Money(b.TotalPrice)</strong> <span class="badge @Ui.Badge(b.Payment?.Status)">@b.Payment?.Status</span></div>
+            </div>
+            <div class="text-end">
+                <span class="badge @Ui.Badge(b.Status)">@b.Status</span>
+                <div class="mt-2 d-flex flex-column gap-1">
+                    @if (b.Status == BookingStatus.Approved || b.Status == BookingStatus.CheckedIn)
+                    {
+                        <a class="btn btn-sm btn-brand" asp-action="CheckIn" asp-route-bookingId="@b.Id">@(b.Status == BookingStatus.CheckedIn ? "View check-in" : "Check in")</a>
+                    }
+                    @if (b.Status == BookingStatus.Pending || b.Status == BookingStatus.Approved)
+                    {
+                        <form asp-action="Cancel" asp-route-id="@b.Id" method="post"><button class="btn btn-sm btn-outline-danger w-100">Cancel</button></form>
+                    }
+                    <a class="btn btn-sm btn-light" asp-controller="Messages" asp-action="Thread" asp-route-id="@b.Property.HostId">Message host</a>
+                </div>
+            </div>
+        </div>
+    </div>
+}

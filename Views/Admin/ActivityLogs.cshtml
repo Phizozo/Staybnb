@@ -1,0 +1,13 @@
+@model List<ActivityLog>
+@{ ViewData["Title"] = "Activity logs"; var type = ViewBag.Type as string; int page = ViewBag.Page; int pages = ViewBag.Pages; }
+<h3>System Audit - Activity Logs</h3>
+<div class="mb-3 d-flex gap-1 flex-wrap"><a class="btn btn-sm @(string.IsNullOrEmpty(type) ? "btn-brand" : "btn-light")" asp-action="ActivityLogs">All</a>
+@foreach (var t in Enum.GetNames(typeof(ActivityType))) { <a class="btn btn-sm @(type == t ? "btn-brand" : "btn-light")" asp-action="ActivityLogs" asp-route-type="@t">@t</a> }</div>
+<div class="card p-3"><table class="table mb-0"><thead><tr><th>When (UTC)</th><th>User</th><th>Action</th><th>Type</th><th>Details</th></tr></thead><tbody>
+@foreach (var a in Model) { <tr><td>@a.CreatedAt.ToString("yyyy-MM-dd HH:mm:ss")</td><td>@(a.User?.Email ?? "System")</td><td>@a.Action</td><td><span class="badge bg-light text-dark">@a.ActivityType</span></td><td class="small text-muted">@a.Details</td></tr> }
+</tbody></table></div>
+<div class="d-flex gap-2 mt-3 align-items-center">
+    @if (page > 1) { <a class="btn btn-sm btn-light" asp-action="ActivityLogs" asp-route-type="@type" asp-route-page="@(page - 1)">← Prev</a> }
+ 
+    @if (page < pages) { <a class="btn btn-sm btn-light" asp-action="ActivityLogs" asp-route-type="@type" asp-route-page="@(page + 1)">Next →</a> }
+</div>

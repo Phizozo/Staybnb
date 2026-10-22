@@ -1,0 +1,40 @@
+@model List<Notification>
+@{
+    ViewData["Title"] = "Notifications";
+    var filter = ViewBag.Filter as string; var sel = ViewBag.Selected as Notification;
+}
+<div class="card p-3" style="max-width:1000px">
+    <div class="d-flex justify-content-between align-items-center mb-2">
+        <h4 class="mb-0">Notifications <span class="badge bg-danger">@ViewBag.Unread new</span></h4>
+        <form asp-action="MarkAllRead" method="post"><button class="btn btn-sm btn-light">Mark all read</button></form>
+    </div>
+    <div class="mb-3 d-flex gap-2">
+        <a class="btn btn-sm @(filter == "all" ? "btn-dark" : "btn-light")" asp-route-filter="all">All (@ViewBag.All)</a>
+        <a class="btn btn-sm @(filter == "unread" ? "btn-dark" : "btn-light")" asp-route-filter="unread">Unread (@ViewBag.Unread)</a>
+        <a class="btn btn-sm @(filter == "read" ? "btn-dark" : "btn-light")" asp-route-filter="read">Read (@ViewBag.Read)</a>
+    </div>
+    <div class="row g-3">
+        <div class="col-md-5"><div class="list-group">
+            @foreach (var n in Model)
+            {
+                <a class="list-group-item list-group-item-action @(n.IsRead ? "" : "border-start border-danger border-3") @(sel?.Id == n.Id ? "active" : "")" asp-route-selectedId="@n.Id" asp-route-filter="@filter">
+                    <div class="d-flex justify-content-between"><strong>@n.Title</strong><small>@n.CreatedAt.ToString("MM-dd HH:mm")</small></div>
+                    <div class="small text-truncate">@n.Message</div>
+                </a>
+            }
+            @if (!Model.Any()) { <div class="text-muted p-2">Nothing to show.</div> }
+        </div></div>
+        <div class="col-md-7">
+            @if (sel != null)
+            {
+                <div class="card p-3 bg-light"><div class="d-flex justify-content-between"><h5>@sel.Title</h5><span class="badge bg-success">READ</span></div>
+                <div class="text-muted small">@sel.CreatedAt.ToString("yyyy-MM-dd HH:mm") UTC · @sel.Type</div><p class="mt-3">@sel.Message</p>
+                <div class="d-flex gap-2">
+                    @if (!string.IsNullOrEmpty(sel.Link)) { <a class="btn btn-brand btn-sm" href="@sel.Link">Take Action</a> }
+                    <form asp-action="Delete" asp-route-id="@sel.Id" method="post"><button class="btn btn-danger btn-sm">Delete</button></form>
+                </div></div>
+            }
+            else { <div class="text-muted">Select a notification to read it.</div> }
+        </div>
+    </div>
+</div>

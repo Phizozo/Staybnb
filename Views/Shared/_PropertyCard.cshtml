@@ -1,0 +1,25 @@
+@model HostProperty
+@{
+    var wished = ViewData["Wished"] as bool? ?? false;
+    var rating = Model.Reviews.Any() ? Model.Reviews.Average(r => r.Rating) : 0;
+    var first = Model.Images.FirstOrDefault()?.ImageUrl;
+}
+<div class="position-relative">
+    <a asp-controller="Properties" asp-action="Details" asp-route-id="@Model.Id" class="text-decoration-none text-dark">
+        @if (first != null) { <img class="prop-img" src="@first" alt="@Model.Title" /> }
+        else { <div class="prop-img bg-secondary-subtle d-flex align-items-center justify-content-center"><i class="bi bi-image fs-1"></i></div> }
+        <div class="d-flex justify-content-between mt-2">
+            <strong>@Model.City</strong><span><i class="bi bi-star-fill" style="color:var(--brand)"></i> @Ui.Stars(rating) (@Model.Reviews.Count)</span>
+        </div>
+        <div class="text-muted small">@Model.Title · @Model.PropertyType</div>
+        <div><strong>@Ui.Money(Model.PricePerNight)</strong> <span class="text-muted small">per night</span></div>
+    </a>
+    @if (User.IsInRole("Guest"))
+    {
+        <form asp-controller="Guest" asp-action="ToggleWishlist" method="post">
+            <input type="hidden" name="propertyId" value="@Model.Id" />
+            <input type="hidden" name="returnUrl" value="@(Context.Request.Path.Value + Context.Request.QueryString.Value)" />
+            <button class="heart" title="Wishlist"><i class="bi @(wished ? "bi-heart-fill text-danger" : "bi-heart")"></i></button>
+        </form>
+    }
+</div>

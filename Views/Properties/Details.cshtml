@@ -1,0 +1,93 @@
+@model PropertyDetailsVM
+@{ var p = Model.Property; ViewData["Title"] = p.Title; var isGuest = User.IsInRole("Guest"); var imgs = p.Images.ToList(); }
+<div class="container" style="max-width:1100px">
+    <div class="d-flex justify-content-between align-items-start">
+        <div>
+            <h2>@p.Title</h2>
+            <div class="text-muted"><i class="bi bi-geo-alt-fill"></i> @p.City, @p.Address</div>
+            <div class="text-muted small">@p.MaxGuests guests · @p.Bedrooms bedrooms · @p.Beds beds · @p.Bathrooms baths · <i class="bi bi-star-fill" style="color:var(--brand)"></i> @Ui.Stars(Model.AverageRating) (@p.Reviews.Count reviews)</div>
+        </div>
+        <div class="text-end">
+            <div><strong>@p.Host.FullName</strong></div><span class="badge bg-danger">Verified Host</span>
+            @if (User.Identity.IsAuthenticated && p.HostId != User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value)
+            {
+                <div class="mt-1"><a class="btn btn-sm btn-outline-brand" asp-controller="Messages" asp-action="Thread" asp-route-id="@p.HostId"><i class="bi bi-chat"></i> Contact host</a></div>
+            }
+        </div>
+    </div>
+    @if (!p.IsActive) { <div class="alert alert-warning mt-3">This listing is not active / pending approval.</div> }
+    <div class="row g-2 my-3">
+        <div class="col-md-8">@if (imgs.Any()) { <img class="prop-img" style="aspect-ratio:16/10" src="@imgs[0].ImageUrl" /> }</div>
+        <div class="col-md-4 d-flex flex-column gap-2">@foreach (var i in imgs.Skip(1).Take(2)) { <img class="prop-img" style="aspect-ratio:16/10" src="@i.ImageUrl" /> }</div>
+    </div>
+    <div class="row g-4">
+        <div class="col-lg-7">
+            <p style="white-space:pre-line">@p.Description</p>
+            <h5>Amenities</h5>
+            <div class="row mb-4">@foreach (var a in p.Amenities) { <div class="col-6 mb-2"><i class="bi @a.IconClass"></i> @a.Name</div> }</div>
+            <h5>Reviews</h5>
+            @if (!p.Reviews.Any()) { <p class="text-muted">No reviews yet.</p> }
+            @foreach (var r in p.Reviews.OrderByDescending(r => r.CreatedAt))
+            {
+                <div class="mb-3"><strong>@r.Reviewer.FullName</strong> <span class="text-warning">@(new string('★', r.Rating))</span> <span class="text-muted small">@r.CreatedAt.ToString("yyyy-MM-dd")</span><div>@r.Comment</div></div>
+            }
+            @if (Model.CanReview)
+            {
+                <form asp-controller="Guest" asp-action="Review" method="post" class="card p-3">
+                    <input type="hidden" name="propertyId" value="@p.Id" />
+                    <label class="form-label">Rating</label>
+                    <select name="rating" class="form-select mb-2">@for (var i = 5; i >= 1; i--) { <option value="@i">@i stars</option> }</select>
+                    <textarea name="comment" class="form-control mb-2" maxlength="1000" placeholder="Share your experience"></textarea>
+                    <button class="btn btn-brand">Submit review</button>
+                </form>
+            }
+        </div>
+        <div class="col-lg-5">
+            <div class="card p-3 position-sticky" style="top:16px">
+                <h4>@Ui.Money(p.PricePerNight) <small class="text-muted fs-6">/ night</small></h4>
+                @if (isGuest && p.IsActive)
+                {
+                    <form asp-controller="Guest" asp-action="Book" method="post">
+                        <input type="hidden" name="propertyId" value="@p.Id" />
+                        <div class="row g-2 mb-2">
+                            <div class="col"><label class="form-label small">CHECK-IN</label><input id="ci" name="checkIn" type="date" class="form-control" required min="@DateTime.Today.ToString("yyyy-MM-dd")" /></div>
+                            <div class="col"><label class="form-label small">CHECKOUT</label><input id="co" name="checkOut" type="date" class="form-control" required /></div>
+                        </div>
+                        <label class="form-label small">GUESTS (max @p.MaxGuests)</label>
+                        <input name="guests" type="number" min="1" max="@p.MaxGuests" value="1" class="form-control mb-3" />
+                        <div id="quote" class="small mb-3 text-muted">Select dates to see the total.</div>
+                        <button class="btn btn-brand w-100">Request to book</button>
+                    </form>
+                    @if (Model.Unavailable.Any()) { <div class="small text-muted mt-2">Unavailable: @string.Join(", ", Model.Unavailable)</div> }
+                    <form asp-controller="Guest" asp-action="ToggleWishlist" method="post" class="mt-2">
+                        <input type="hidden" name="propertyId" value="@p.Id" /><input type="hidden" name="returnUrl" value="@Context.Request.Path" />
+                        <button class="btn btn-sm btn-light w-100"><i class="bi @(Model.IsWishlisted ? "bi-heart-fill text-danger" : "bi-heart")"></i> @(Model.IsWishlisted ? "Remove from wishlist" : "Save to wishlist")</button>
+                    </form>
+                }
+                else if (!User.Identity.IsAuthenticated)
+                {
+                    <a class="btn btn-brand" asp-controller="Account" asp-action="Login" asp-route-returnUrl="@Context.Request.Path">Log in to book</a>
+                }
+                else if (!isGuest) { <div class="text-muted small">Only Guests can book stays.</div> }
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts {
+<script>
+    const ci = document.getElementById('ci'), co = document.getElementById('co'), box = document.getElementById('quote');
+    const money = n => 'R ' + Number(n).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+    async function quote() {
+        if (!ci || !ci.value || !co.value) return;
+        const r = await fetch(`/Properties/Quote/@(p.Id)?checkIn=${ci.value}&checkOut=${co.value}`);
+        const d = await r.json();
+        if (!d.ok) { box.textContent = d.error; return; }
+        box.innerHTML = `<div class="d-flex justify-content-between"><span>${money(@p.PricePerNight.ToString(System.Globalization.CultureInfo.InvariantCulture))} x ${d.nights} night(s)</span><span>${money(d.subtotal)}</span></div>
+            <div class="d-flex justify-content-between"><span>Cleaning fee</span><span>${money(d.cleaning)}</span></div>
+            <div class="d-flex justify-content-between"><span>Service fee</span><span>${money(d.service)}</span></div>
+            <hr class="my-1"><div class="d-flex justify-content-between fw-bold text-dark"><span>Total</span><span>${money(d.total)}</span></div>`;
+    }
+    ci && ci.addEventListener('change', () => { co.min = ci.value; quote(); });
+    co && co.addEventListener('change', quote);
+</script>
+}

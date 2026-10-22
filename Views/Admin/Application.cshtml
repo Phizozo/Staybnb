@@ -1,0 +1,23 @@
+@model HostApplication
+@{ ViewData["Title"] = "Review application"; var p = Model.Property; }
+<div class="container" style="max-width:900px">
+    <a asp-action="Applications">← Back</a>
+    <h3 class="mt-2">@p.Title <span class="badge @Ui.Badge(Model.Status)">@Model.Status</span></h3>
+    <p class="text-muted">Applicant: @Model.ApplicationUser.FullName (@Model.ApplicationUser.Email) · @((bool)ViewBag.IsFirstApplication ? "First application - approval promotes them from Guest to Host" : "Existing host - additional property") · applied @Model.AppliedAt.ToString("yyyy-MM-dd")</p>
+    <div class="row g-2 mb-3">@foreach (var i in p.Images) { <div class="col-4"><img class="prop-img" src="@i.ImageUrl" /></div> }</div>
+    <div class="card p-3 mb-3">
+        <div>@p.PropertyType in @p.City - @p.Address</div>
+        <div><strong>@Ui.Money(p.PricePerNight)</strong> / night · cleaning @Ui.Money(p.CleaningFee) · @p.MaxGuests guests · @p.Bedrooms bedrooms · @p.Beds beds · @p.Bathrooms baths</div>
+        <p class="mt-2 mb-1" style="white-space:pre-line">@p.Description</p>
+        <div>@foreach (var a in p.Amenities) { <span class="badge bg-light text-dark me-1"><i class="bi @a.IconClass"></i> @a.Name</span> }</div>
+    </div>
+    @if (Model.Status == ApplicationStatus.Pending)
+    {
+        <form asp-action="ReviewApplication" method="post" class="card p-3">
+            <input type="hidden" name="id" value="@Model.Id" />
+            <label class="form-label">Note to applicant (optional)</label><textarea name="note" maxlength="500" class="form-control mb-3"></textarea>
+            <div class="d-flex gap-2"><button name="approve" value="true" class="btn btn-success">Approve</button><button name="approve" value="false" class="btn btn-danger">Reject</button></div>
+        </form>
+    }
+    else if (!string.IsNullOrEmpty(Model.AdminNote)) { <div class="alert alert-secondary">Admin note: @Model.AdminNote</div> }
+</div>

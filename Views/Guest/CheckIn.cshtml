@@ -1,0 +1,55 @@
+@model GuestCheckInVM
+@{
+    ViewData["Title"] = "Check-in";
+    var ci = Model.CheckIn;
+    int step = ci.Status switch { CheckInStatus.Pending => 1, CheckInStatus.RulesAccepted or CheckInStatus.Rejected => 2, _ => 3 };
+    var bid = Model.Booking.Id;
+}
+<div class="container" style="max-width:800px">
+    <h3>@Model.ProcessTitle</h3>
+    <p class="text-muted">@Model.Booking.Property.Title · @Model.Booking.CheckInDate.ToString("yyyy-MM-dd") to @Model.Booking.CheckOutDate.ToString("yyyy-MM-dd") · Status: <span class="badge @Ui.Badge(ci.Status)">@ci.Status</span></p>
+    <div class="progress mb-4" style="height:8px"><div class="progress-bar bg-danger" style="width:@(ci.Status == CheckInStatus.Verified ? 100 : step * 33)%"></div></div>
+
+    <div class="card p-3 mb-3">
+        <h5>Step 1 · House rules</h5>
+        <ul>@foreach (var r in Model.Config.Rules) { <li>@r</li> }</ul>
+        @if (ci.Status == CheckInStatus.Pending)
+        {
+            <form asp-action="AcceptRules" method="post"><input type="hidden" name="bookingId" value="@bid" /><button class="btn btn-brand">I accept the house rules</button></form>
+        }
+        else { <div class="text-success"><i class="bi bi-check-circle-fill"></i> Rules accepted</div> }
+    </div>
+
+    <div class="card p-3 mb-3">
+        <h5>Step 2 · Upload documents</h5>
+        @foreach (var type in Model.Config.Documents)
+        {
+            var doc = ci.Documents.FirstOrDefault(d => d.DocumentType == type);
+            <div class="border rounded p-2 mb-2">
+                <div class="d-flex justify-content-between"><strong>@type</strong>
+                    @if (doc != null) { <span class="badge @Ui.Badge(doc.Status)">@doc.Status</span> } else { <span class="badge bg-light text-dark">Missing</span> }</div>
+                @if (doc != null) { <a class="small" target="_blank" asp-controller="Documents" asp-action="Download" asp-route-id="@doc.Id">@doc.OriginalName</a> }
+                @if (ci.Status == CheckInStatus.RulesAccepted || ci.Status == CheckInStatus.Rejected)
+                {
+                    <form asp-action="UploadDocument" method="post" enctype="multipart/form-data" class="d-flex gap-2 mt-2">
+                        <input type="hidden" name="bookingId" value="@bid" /><input type="hidden" name="documentType" value="@type" />
+                        <input type="file" name="file" accept=".jpg,.jpeg,.png,.pdf" class="form-control form-control-sm" required />
+                        <button class="btn btn-sm btn-outline-brand">@(doc == null ? "Upload" : "Replace")</button>
+                    </form>
+                }
+            </div>
+        }
+    </div>
+
+    <div class="card p-3">
+        <h5>Step 3 · Submit for verification</h5>
+        @if (ci.Status == CheckInStatus.RulesAccepted || ci.Status == CheckInStatus.Rejected)
+        {
+            @if (ci.Status == CheckInStatus.Rejected) { <div class="alert alert-warning">The host rejected a document. Replace it and submit again.</div> }
+            <form asp-action="SubmitCheckIn" method="post"><input type="hidden" name="bookingId" value="@bid" /><button class="btn btn-brand">Submit check-in</button></form>
+        }
+        else if (ci.Status == CheckInStatus.Submitted) { <div class="text-warning"><i class="bi bi-hourglass-split"></i> Waiting for the host to verify your documents.</div> }
+        else if (ci.Status == CheckInStatus.Verified) { <div class="text-success"><i class="bi bi-patch-check-fill"></i> Verified - you're checked in!</div> }
+        else { <div class="text-muted">Complete the previous steps first.</div> }
+    </div>
+</div>

@@ -1,0 +1,23 @@
+@model AdminDashboardVM
+@{ ViewData["Title"] = "Admin Dashboard"; }
+<h3>Dashboard Overview</h3>
+<div class="row g-3 mb-4">
+    <div class="col-6 col-lg-3"><div class="card p-3"><div class="text-muted small">Total Users</div><div class="stat">@Model.TotalUsers</div></div></div>
+    <div class="col-6 col-lg-3"><div class="card p-3"><div class="text-muted small">Pending Host Apps</div><div class="stat text-warning">@Model.PendingApps</div><a class="small" asp-action="Applications">Require review</a></div></div>
+    <div class="col-6 col-lg-3"><div class="card p-3"><div class="text-muted small">Active Properties</div><div class="stat">@Model.ActiveProperties</div></div></div>
+    <div class="col-6 col-lg-3"><div class="card p-3"><div class="text-muted small">Platform Revenue</div><div class="stat">@Ui.Money(Model.Revenue)</div></div></div>
+    <div class="col-6 col-lg-3"><div class="card p-3"><div class="text-muted small">Total Bookings</div><div class="stat">@Model.TotalBookings</div><div class="small text-muted">@Model.PendingBookings pending</div></div></div>
+    <div class="col-6 col-lg-3"><div class="card p-3"><div class="text-muted small">Approved Hosts</div><div class="stat">@Model.ApprovedHosts</div></div></div>
+</div>
+<div class="card p-3 mb-4"><div class="d-flex justify-content-between"><h5>Recent Activity</h5><a asp-action="ActivityLogs">View all</a></div>
+<table class="table mb-0"><thead><tr><th>User</th><th>Action</th><th>Date</th><th>Type</th></tr></thead><tbody>
+@foreach (var a in Model.Activity) { <tr><td>@(a.User?.FullName ?? "System")</td><td>@a.Action</td><td>@a.CreatedAt.ToString("yyyy-MM-dd HH:mm")</td><td><span class="badge bg-light text-dark">@a.ActivityType</span></td></tr> }
+</tbody></table></div>
+<div class="row g-3">
+    <div class="col-lg-6"><div class="card p-3"><h5>Recent Host Applications</h5><table class="table mb-0"><tbody>
+    @foreach (var a in Model.Applications) { <tr><td>@a.ApplicationUser.FullName<div class="small text-muted">@a.ApplicationUser.Email</div></td><td>@a.AppliedAt.ToString("yyyy-MM-dd")</td><td><span class="badge @Ui.Badge(a.Status)">@a.Status</span></td><td><a asp-action="Application" asp-route-id="@a.Id"><i class="bi bi-eye"></i></a></td></tr> }
+    </tbody></table></div></div>
+    <div class="col-lg-6"><div class="card p-3"><h5>Recent Bookings</h5><table class="table mb-0"><tbody>
+    @foreach (var b in Model.Bookings) { <tr><td>@b.Guest.FullName<div class="small text-muted">@b.Property.Title</div></td><td>@b.CheckInDate.ToString("dd MMM") - @b.CheckOutDate.ToString("dd MMM")</td><td><span class="badge @Ui.Badge(b.Status)">@b.Status</span></td></tr> }
+    </tbody></table></div></div>
+</div>

@@ -1,0 +1,26 @@
+@model List<Booking>
+@{ ViewData["Title"] = "Booking requests"; }
+<h3>Booking Requests</h3>
+<div class="card p-3"><div class="table-responsive"><table class="table align-middle">
+<thead><tr><th>Guest</th><th>Property</th><th>Dates</th><th>Total</th><th>Status</th><th>Check-in</th><th></th></tr></thead><tbody>
+@foreach (var b in Model)
+{
+    <tr>
+        <td>@b.Guest.FullName<div class="small"><a asp-controller="Messages" asp-action="Thread" asp-route-id="@b.GuestId">Message</a></div></td>
+        <td>@b.Property.Title</td><td>@b.CheckInDate.ToString("yyyy-MM-dd") → @b.CheckOutDate.ToString("yyyy-MM-dd")<div class="small text-muted">@b.NumberOfGuests guest(s)</div></td>
+        <td>@Ui.Money(b.TotalPrice)<div><span class="badge @Ui.Badge(b.Payment?.Status)">@b.Payment?.Status</span></div></td>
+        <td><span class="badge @Ui.Badge(b.Status)">@b.Status</span></td>
+        <td>@if (b.GuestCheckIn != null) { <a asp-action="CheckInDetail" asp-route-id="@b.GuestCheckIn.Id"><span class="badge @Ui.Badge(b.GuestCheckIn.Status)">@b.GuestCheckIn.Status</span></a> } else { <span class="text-muted">-</span> }</td>
+        <td class="text-end">
+            @if (b.Status == BookingStatus.Pending)
+            {
+                <form asp-action="BookingAction" method="post" class="d-inline"><input type="hidden" name="id" value="@b.Id" /><button name="act" value="approve" class="btn btn-sm btn-success">Approve</button> <button name="act" value="reject" class="btn btn-sm btn-danger">Reject</button></form>
+            }
+            else if (b.Status == BookingStatus.CheckedIn && DateTime.Today >= b.CheckOutDate.Date)
+            {
+                <form asp-action="BookingAction" method="post"><input type="hidden" name="id" value="@b.Id" /><button name="act" value="complete" class="btn btn-sm btn-secondary">Mark completed</button></form>
+            }
+        </td>
+    </tr>
+}
+</tbody></table></div></div>

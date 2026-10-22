@@ -1,0 +1,9 @@
+@model NavCountsVM
+<a class="btn btn-light rounded-circle position-relative" asp-controller="Messages" asp-action="Index" title="Messages">
+    <i class="bi bi-envelope"></i>
+    @if (Model.Messages > 0) { <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">@Model.Messages</span> }
+</a>
+<a class="btn btn-light rounded-circle position-relative" asp-controller="Notifications" asp-action="Index" title="Notifications">
+    <i class="bi bi-bell"></i>
+    @if (Model.Notifications > 0) { <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">@Model.Notifications</span> }
+</a>

@@ -1,0 +1,23 @@
+@model PropertyIndexVM
+@{ ViewData["Title"] = "Explore stays"; }
+<h3 class="mb-3">Relax. Unwind. Choose your next stay.</h3>
+<form method="get" class="row g-2 mb-4">
+    <div class="col-md-4"><select name="city" class="form-select">
+        <option value="">Any city</option>
+        @foreach (var c in Model.Cities) { <option value="@c" selected="@(c == Model.City)">@c</option> }
+    </select></div>
+    <div class="col-md-4"><select name="type" class="form-select">
+        <option value="">Any property type</option>
+        @foreach (var t in PropertyTypes.All) { <option value="@t" selected="@(t == Model.Type)">@t</option> }
+    </select></div>
+    <div class="col-md-4"><button class="btn btn-brand">Filter</button> <a class="btn btn-light" asp-action="Index">Clear</a></div>
+</form>
+@if (!Model.Properties.Any()) { <p class="text-muted">No stays match your filters yet.</p> }
+<div class="row g-4">
+    @foreach (var p in Model.Properties)
+    {
+        <div class="col-6 col-md-4 col-xl-3">
+            <partial name="_PropertyCard" model="p" view-data='new ViewDataDictionary(ViewData) { { "Wished", Model.WishlistIds.Contains(p.Id) } }' />
+        </div>
+    }
+</div>

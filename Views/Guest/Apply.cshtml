@@ -1,0 +1,7 @@
+@model PropertyFormVM
+@{ ViewData["Title"] = "Become a Host"; ViewData["C"] = "Guest"; ViewData["A"] = "Apply"; ViewData["Button"] = "Submit application"; ViewData["ImagesRequired"] = true; }
+<div class="container" style="max-width:850px">
+    <h3>Become a Host</h3>
+    <p class="text-muted">Tell us about your first property. An application cannot be submitted without at least one photo. An admin will review it and, once approved, your account becomes a Host account.</p>
+    <div class="card p-4"><partial name="_PropertyForm" model="Model" view-data="ViewData" /></div>
+</div>
