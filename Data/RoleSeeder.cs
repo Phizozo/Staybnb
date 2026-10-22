@@ -30,7 +30,9 @@ public static class RoleSeeder
         {
             superAdmin = new ApplicationUser
             {
-                UserName = email, Email = email, EmailConfirmed = true,
+                UserName = email,
+                Email = email,
+                EmailConfirmed = true,
                 FirstName = cfg["SeedSuperAdmin:FirstName"] ?? "Super",
                 LastName = cfg["SeedSuperAdmin:LastName"] ?? "Admin"
             };
